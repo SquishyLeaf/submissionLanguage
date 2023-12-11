@@ -16,14 +16,16 @@ window.addEventListener("load", (_) => {
         continue;
       }
 
-      if (mutation.addedNodes[0].className == "listPanel__itemsList") {
-        for (let listElement of mutation.addedNodes[0].children) {
+      let addedEl = mutation.addedNodes[0];
+
+      if (addedEl.className == "listPanel__itemsList") {
+        for (let listElement of addedEl.children) {
           addLanguageInfo(listElement);
         }
       }
 
-      if (mutation.addedNodes[0].className == "listPanel__item") {
-        addLanguageInfo(mutation.addedNodes[0]);
+      if (addedEl.className == "listPanel__item" && !addedEl.querySelector(".listPanel__itemSubtitle--submissionTitle")) {
+        addLanguageInfo(addedEl);
       }
     }
   }
@@ -39,23 +41,24 @@ function addLanguageInfo(listElement) {
   let titleElement = submissionEntry.querySelector(".listPanel__itemSubtitle");
   let formattedLocale = localeToLanguageCode(submissionLocales.get(id));
 
+  let langSpan = document.createElement("span");
+  let titleSpan = document.createElement("span");
+
   // Plugin setting received from the server.
   if (useCountryFlags) {
-    titleElement.textContent = localeToFlag(formattedLocale) + titleElement.textContent;
+    langSpan.classList.add("listPanel__itemSubtitle--submissionLanguageFlag");
+    langSpan.textContent = localeToFlag(formattedLocale);
   } else {
-    let langCodeSpan = document.createElement("span");
-    let titleSpan = document.createElement("span");
-
-    langCodeSpan.classList.add("listPanel__itemSubtitle--submissionLanguage");
-    titleSpan.classList.add("listPanel__itemSubtitle--submissionTitle");
-
-    langCodeSpan.textContent = formattedLocale;
-    titleSpan.textContent = titleElement.textContent;
-    titleElement.textContent = "";
-
-    titleElement.appendChild(langCodeSpan);
-    titleElement.appendChild(titleSpan);
+    langSpan.classList.add("listPanel__itemSubtitle--submissionLanguage");
+    langSpan.textContent = formattedLocale;
   }
+
+  titleSpan.classList.add("listPanel__itemSubtitle--submissionTitle");
+  titleSpan.textContent = titleElement.textContent;
+  titleElement.textContent = "";
+
+  titleElement.appendChild(langSpan);
+  titleElement.appendChild(titleSpan);
 }
 
 // Given a locale string like "en_US" or "en"
