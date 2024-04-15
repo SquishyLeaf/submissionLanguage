@@ -52,8 +52,8 @@ class SubmissionLanguagePlugin extends GenericPlugin {
 		}
 
 		$templateMgr = TemplateManager::getManager($request);
-		$script_path = $request->getBaseUrl() . '/' . $this->getPluginPath() . '/js/language.js';
-		$css_url = $request->getBaseUrl() . '/' . $this->getPluginPath() . '/css/styles.css';
+		$script_path = __DIR__ . '/js/language.js';
+		$css_url = __DIR__ . '/css/styles.css';
 
 		$submissions = json_encode(array_values($this->fetchSubmissions()));
 		$use_country_flags_bool = $this->getSetting($request->getContext()->getId(), 'useCountryFlags');
