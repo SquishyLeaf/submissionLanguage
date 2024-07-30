@@ -1,4 +1,4 @@
-# Submission Language Plugin for OJS 3.3
+# Submission Language Plugin for OJS 3.4
 
 Display the manuscript language declared by the author upon creating a new submission for a multi-language journal. This plugin works only on the editorial dashboard for users with Manager-level roles.
 
