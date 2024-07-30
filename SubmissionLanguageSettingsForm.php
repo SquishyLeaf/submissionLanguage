@@ -1,14 +1,26 @@
 <?php
-import('lib.pkp.classes.form.Form');
+// import('lib.pkp.classes.form.Form');
+namespace APP\plugins\generic\submissionLanguage;
+
+use APP\core\Application;
+use APP\notification\Notification;
+use APP\notification\NotificationManager;
+use APP\template\TemplateManager;
+use PKP\form\Form;
+use PKP\form\validation\FormValidatorCSRF;
+use PKP\form\validation\FormValidatorPost;
+
 class SubmissionLanguageSettingsForm extends Form {
 
-	/** @var SubmissionLanguagePlugin  */
-	public $plugin;
+	// /** @var SubmissionLanguagePlugin  */
+	// public $plugin;
+	public SubmissionLanguagePlugin $plugin;
+
 
 	/**
 	 * @copydoc Form::__construct()
 	 */
-	public function __construct($plugin) {
+	public function __construct(SubmissionLanguagePlugin $plugin) {
 
 		// Define the settings template and store a copy of the plugin object
 		parent::__construct($plugin->getTemplateResource('settings.tpl'));
@@ -16,7 +28,7 @@ class SubmissionLanguageSettingsForm extends Form {
 
 		// Always add POST and CSRF validation to secure your form.
 		$this->addCheck(new FormValidatorPost($this));
-		$this->addCheck(new FormValidatorCSRF($this));
+        $this->addCheck(new FormValidatorCSRF($this));
 	}
 
 	/**
