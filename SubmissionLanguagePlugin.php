@@ -1,15 +1,23 @@
 <?php
 /**
- * @file SubmissionLanguagePlugin.inc.php
- * 
+ * @file SubmissionLanguagePlugin.php
+ *
  * @class SubmissionLanguagePlugin
  * @brief Plugin class for the SubmissionLanguage plugin.
 */
 
-import('lib.pkp.classes.plugins.HookRegistry');
-import('lib.pkp.classes.plugins.GenericPlugin');
-import('lib.pkp.classes.db.DAORegistry');
-import('lib.pkp.classes.security.Role');
+namespace APP\plugins\generic\submissionLanguage;
+
+use PKP\plugins\Hook;
+use PKP\plugins\GenericPlugin;
+use PKP\security\Role;
+use APP\core\Application;
+use APP\template\TemplateManager;
+use PKP\linkAction\request\AjaxModal;
+use PKP\linkAction\LinkAction;
+use PKP\core\JSONMessage;
+use APP\facades\Repo;
+
 class SubmissionLanguagePlugin extends GenericPlugin {
 
 	/**
@@ -18,7 +26,7 @@ class SubmissionLanguagePlugin extends GenericPlugin {
 	public function register($category, $path, $mainContextId = NULL) {
 		$success = parent::register($category, $path);
 		if ($success && $this->getEnabled()) {
-			HookRegistry::register('TemplateManager::display', [$this, 'addLanguageInformation']);
+			Hook::add('TemplateManager::display', [$this, 'addLanguageInformation']);
 		}
 		return $success;
 	}
@@ -53,9 +61,9 @@ class SubmissionLanguagePlugin extends GenericPlugin {
 
 		$templateMgr = TemplateManager::getManager($request);
 		$script_path = __DIR__ . '/js/language.js';
-		$css_url = __DIR__ . '/css/styles.css';
+		$css_url = $request->getBaseUrl() . '/' . $this->getPluginPath() . '/css/styles.css';
 
-		$submissions = json_encode(array_values($this->fetchSubmissions()));
+		$submissions = json_encode($this->fetchSubmissions());
 		$use_country_flags_bool = $this->getSetting($request->getContext()->getId(), 'useCountryFlags');
 
 		if ($use_country_flags_bool) {
@@ -104,7 +112,9 @@ class SubmissionLanguagePlugin extends GenericPlugin {
 		// Create a LinkAction that will make a request to the
 		// plugin's `manage` method with the `settings` verb.
 		$router = $request->getRouter();
-		import('lib.pkp.classes.linkAction.request.AjaxModal');
+
+		// use PKP\linkAction
+		// import('lib.pkp.classes.linkAction.request.AjaxModal');
 		$linkAction = new LinkAction(
 			'settings',
 			new AjaxModal(
@@ -147,7 +157,6 @@ class SubmissionLanguagePlugin extends GenericPlugin {
 			case 'settings':
 
 				// Load the custom form
-				$this->import('SubmissionLanguageSettingsForm');
 				$form = new SubmissionLanguageSettingsForm($this);
 
 				// Fetch the form the first time it loads, before
@@ -167,30 +176,20 @@ class SubmissionLanguagePlugin extends GenericPlugin {
 		return parent::manage($args, $request);
 	}
 
-	// Fetch all submissions in the current journal
+	// Fetch submission_ids and locale of all submissions in the current journal
 	function fetchSubmissions() {
-		$submissionDAO = DAORegistry::getDAO("SubmissionDAO");
-
+		$submissionRepo = Repo::submission();
 		$context = Application::get()->getRequest()->getContext();
-		$journal_id = $context->getId();
-			$result = $submissionDAO->retrieve(
-				'SELECT submission_id as submissionId,locale FROM submissions WHERE context_id = ?',
-				[$journal_id]
-			);
 
-			$submissions = [];
+		$submissions = $submissionRepo
+                              		->getCollector()
+		                            ->filterByContextIds([$context->getId()])
+									->getQueryBuilder()
+									->select(['s.submission_id', 's.locale'])
+									->get()
+									->map(fn ($row) => array_values(get_object_vars($row)));
 
-			foreach ($result as $val) {
-				$submissions[] = $val;
-			}
-
-			// Convert and return the submissions as
-			// an array of [submission_id,locale] pairs.
-			$submissions = array_map(function($pub_id_locale) {
-				return array_values(get_object_vars($pub_id_locale));
-			}, $submissions);
-
-			return $submissions;
+		return $submissions;
 	}
 
 	// Checks if currently loaded user has
