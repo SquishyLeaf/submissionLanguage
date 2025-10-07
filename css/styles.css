@@ -1,7 +1,26 @@
-.listPanel__itemSubtitle--submissionLanguage {
+.listPanel__itemSubtitle--submissionLanguage-default {
   display: inline-block;
   background-color: #EAEDEE;
   border-radius: 0.1em;
   padding-left: 0.5em;
   padding-right: 0.5em;
+  margin-right: 0.2em;
+}
+
+.listPanel__itemSubtitle--submissionLanguage-en {
+  display: inline-block;
+  background-color: #5994dc;
+  border-radius: 0.1em;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  margin-right: 0.2em;
+}
+
+.listPanel__itemSubtitle--submissionLanguage-pl {
+  display: inline-block;
+  background-color: #f99683;
+  border-radius: 0.1em;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  margin-right: 0.2em;
 }

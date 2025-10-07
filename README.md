@@ -2,4 +2,4 @@
 
 Display the manuscript language declared by the author upon creating a new submission for a multi-language journal. This plugin works only on the editorial dashboard for users with Manager-level roles.
 
-Use the checkbox in plugin settings to select, whether the language information should be displayed as an ISO language code, or country flag (may not work correctly in some cases).
+Submission language will be displayed next to the title as a country flag or as a two-letter ISO country code in browsers not supporting country flag emoji (e.g., Chromium browsers on Windows).
